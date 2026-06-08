@@ -18,12 +18,22 @@ const isDarkTheme = (): boolean => {
 const DARK_STYLE =
   "<style data-allure-preview-theme>:root,html,body{background:#1c1c1e !important;color:#e5e5e7 !important;}body *{border-color:rgba(255,255,255,0.12) !important;}</style>";
 
+const getIframeContentHeight = (iframe: HTMLIFrameElement) => {
+  const documentElement = iframe.contentDocument?.documentElement;
+  const body = iframe.contentDocument?.body;
+  const bodyRectHeight = body?.getBoundingClientRect().height ?? 0;
+  const scrollHeight = Math.max(body?.scrollHeight ?? 0, documentElement?.scrollHeight ?? 0);
+
+  return Math.ceil(Math.max(bodyRectHeight, scrollHeight));
+};
+
 export type HtmlAttachmentPreviewProps = {
   attachment: { text: string };
 };
 
 export const HtmlPreview: FunctionalComponent<HtmlAttachmentPreviewProps> = ({ attachment }) => {
   const [blobUrl, setBlobUrl] = useState<string>("");
+  const [height, setHeight] = useState(0);
 
   const rawText = attachment.text ?? "";
   const sanitizedText = rawText.length > 0 ? sanitize(rawText) : "";
@@ -54,9 +64,21 @@ export const HtmlPreview: FunctionalComponent<HtmlAttachmentPreviewProps> = ({ a
     return null;
   }
 
+  const handleLoad = (e: Event) => {
+    const iframe = e.currentTarget as HTMLIFrameElement;
+    setHeight(getIframeContentHeight(iframe));
+  };
+
   return (
     <div className={styles["html-attachment-preview"]}>
-      <iframe src={blobUrl} width="100%" height="100%" frameBorder="0" sandbox="allow-same-origin" />
+      <iframe
+        src={blobUrl}
+        width="100%"
+        height={height ? String(height) : "100%"}
+        frameBorder="0"
+        sandbox="allow-same-origin"
+        onLoad={handleLoad}
+      />
     </div>
   );
 };
