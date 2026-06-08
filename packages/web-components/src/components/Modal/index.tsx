@@ -55,12 +55,12 @@ export const Modal = ({
 }: ModalDataProps & ModalTranslationsProps) => {
   const { tooltipPreview, tooltipSyntaxHighlight, tooltipDownload, openInNewTabButton } = translations;
   const { link } = data || {};
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [preview, setPreview] = useState(!!initialPreview);
-  const [highlightCode, setHighlightCode] = useState(true);
-
   const isImageAttachment = link?.contentType?.startsWith("image");
   const isPreviewableAttachment = isPreviewableContentType(link?.contentType);
+  const defaultPreview = initialPreview ?? isPreviewableAttachment;
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [preview, setPreview] = useState(defaultPreview);
+  const [highlightCode, setHighlightCode] = useState(true);
   const isCodeView =
     !isImageAttachment && !link?.contentType?.startsWith("video") && (isPreviewableAttachment ? !preview : true);
   const isSyntaxHighlightable = isSyntaxHighlightSupported({
@@ -75,10 +75,10 @@ export const Modal = ({
 
   useEffect(() => {
     if (isModalOpen) {
-      setPreview(!!initialPreview);
+      setPreview(defaultPreview);
       setHighlightCode(true);
     }
-  }, [isModalOpen, initialPreview]);
+  }, [isModalOpen, defaultPreview]);
 
   const WrappedComponent = useMemo(() => {
     return (
