@@ -219,6 +219,11 @@
 
 .attachmentViewStack {
   width: 100%;
+  min-height: 0;
+}
+
+.attachmentViewPane {
+  min-height: 0;
 }
 
 .attachmentViewPane[hidden] {
